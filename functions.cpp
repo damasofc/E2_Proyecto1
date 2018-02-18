@@ -20,6 +20,14 @@ struct file_entry {
 
 };
 
+struct METADATA
+{
+	int bm_size; //bit map size
+	int entry_amount; //entradas(tamano)
+	int block_size; //tamano bloque
+	int block_amount; //cantidad bloques
+};
+
 void createDisc(string name, int cantEntradas, int cantBloques){
     
 }
