@@ -2,12 +2,14 @@
  
 using namespace std;
 
-struct data_block{
+struct data_block
+{
 	char data[1020];
 	int siguiente;
 };
 
-struct file_entry {
+struct file_entry 
+{
 	char nombre[30];
 	int tamano;
     // 'D' DIrectorio  o  'A' Archivo
