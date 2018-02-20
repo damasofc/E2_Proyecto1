@@ -1,6 +1,7 @@
 #ifndef E2_PROYECTO1_DISC_STRUCTS_H
 #define E2_PROYECTO1_DISC_STRUCTS_H
 
+
 struct data_block
 {
     char data[1020];
@@ -11,7 +12,7 @@ struct file_entry
 {
     char nombre[30];
     int tamano;
-    char tipo; // 'D' Directorio  o  'A' Archivo
+    char tipo[1]; // 'D' Directorio  o  'A' Archivo
     int padre;
     int primer_hijo;
     int hermano_derecho;
