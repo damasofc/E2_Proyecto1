@@ -1,4 +1,5 @@
 #include <iostream>
+#include "functions.h"
 
  
 using namespace std;
@@ -75,12 +76,13 @@ int menuPrincipal(){
 }
 int main()
 {
-    int i;
-    do
-    {
-        i = menuPrincipal();
+    // int i;
+    // do
+    // {
+    //     i = menuPrincipal();
 
-    } while(i!=3);
+    // } while(i!=3);s
+    createDisc("part1",100,200);
 
             
     return 0;

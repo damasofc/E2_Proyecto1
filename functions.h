@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <string.h>
+#include <cstring>
 #include "disc_structs.h"
  
 using namespace std;
@@ -26,6 +28,7 @@ int turnBitOn(unsigned char byte, int position)
 
 void createDisc(string name, int cantEntradas, int cantBloques)
 {
+	int posPuntero = 0;
     string nombreDisco = name + ".dat";
 	if(existFile(nombreDisco.c_str()))
 	{
@@ -33,7 +36,8 @@ void createDisc(string name, int cantEntradas, int cantBloques)
 	}
 	int bmSize = cantBloques / 8;
 	int tamanoBloque = 1024;
-	ofstream out(nombreDisco.c_str(),ios::out | ios::in);
+	ofstream out(nombreDisco.c_str(),ios::in | ios::out | ios::binary);
+	out.open(nombreDisco.c_str());
 	//metaData
 	out.write((char*)&bmSize,4);
 	out.write((char*)&cantEntradas,4);
@@ -41,29 +45,38 @@ void createDisc(string name, int cantEntradas, int cantBloques)
 	out.write((char*)&cantBloques,4);
 	//Bitmap
 	out.write((char*)&cantBloques,4);
-	int bytesBitMap = bmSize /8;
-	char* bitmap = new char[bytesBitMap];
-	for(int i = 0; i < bytesBitMap; i++)
+	char* bitmap = new char[bmSize];
+	for(int i = 0; i < bmSize; i++)
 	{
 		bitmap[i] = 0;
 	}
-	out.write(bitmap,bytesBitMap);
+	out.write(bitmap,bmSize);
+	posPuntero = 20 + bmSize +1;
 	//escribir informacion vacia de files entries
+	file_entry fat[cantEntradas];
 	for(int i = 0; i < cantEntradas; i++)
 	{
-		char* datosVacios = new char[51];
-		out.write(datosVacios,51);
-		bool ocupado = false;
-		out.write((char*)&ocupado,4);
+		for(int m = 0; m < 30; m++)
+		{
+			fat[i].nombre[m] = '-';
+		}
+		fat[i].tamano = 0;
+		fat[i].tipo = 'O';
+		fat[i].padre = -1;
+		fat[i].primer_hijo = -1;
+		fat[i].hermano_derecho = -1;
+		fat[i].primer_bloque_data = -1;
+		fat[i].libre = true;
+		//out.write(reinterpret_cast<const char*>(&fat[i]),sizeof(file_entry));
 	}
+	out.write(reinterpret_cast<const char*>(fat),sizeof(fat));
 	//escribir informacion vacia de bloques de data
 	for(int i = 0; i < cantBloques; i++)
 	{
-		char* vacio = new char[1020];
-		int sig = -1;
-		out.write(vacio,1020);
-		out.write((char*)&sig,4);
+		data_block* bloque = new data_block();
+		bloque->siguiente = -1;
+		out.write((char*)bloque,sizeof(bloque));
 	}
-	out.close();
+	return;
 }
 
