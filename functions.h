@@ -14,20 +14,6 @@ bool existFile(const char *fileName)
     return infile.good();
 }
 
-int getBit(unsigned char byte,int position)
-{
-	return (byte >> position) & 0x1;
-}
-//estas 2 funciones debo probarlas.
-int turnBitOff(unsigned char byte,int position)
-{
-	return (byte ^= (1 << position));
-}
-int turnBitOn(unsigned char byte, int position)
-{
-	return byte |= (1u << position);	
-}
-
 bool createDisc(string name, int cantEntradas, int cantBloques)
 {
     string nombreDisco = name + ".dat";

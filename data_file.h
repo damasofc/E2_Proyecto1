@@ -2,6 +2,7 @@
 #define E2_PROYECTO1_DATA_FILE_H
 
 #include <fstream>
+#include <string>
 
 using namespace std;
 

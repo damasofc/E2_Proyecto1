@@ -29,6 +29,8 @@ public:
     int getBit(unsigned char byte,int position);
     int turnBitOff(unsigned char byte,int position);
     int turnBitOn(unsigned char byte,int position);
+    int getFirstBlockEmpty();
+    char* getBitMap();
 
 private:
     data_file archivo;
