@@ -1,6 +1,10 @@
 #include <iostream>
 #include <fstream>
+#include <string.h>
+#include <cstring>
+#include <bitset>
 #include "disc_structs.h"
+#include "registro.h"
  
 using namespace std;
 
@@ -10,60 +14,69 @@ bool existFile(const char *fileName)
     return infile.good();
 }
 
-int getBit(unsigned char byte,int position)
-{
-	return (byte >> position) & 0x1;
-}
-//estas 2 funciones debo probarlas.
-int turnBitOff(unsigned char byte,int position)
-{
-	return (byte ^= (1 << position));
-}
-int turnBitOn(unsigned char byte, int position)
-{
-	return (byte |= (1 << position));	
-}
-
-void createDisc(string name, int cantEntradas, int cantBloques)
+bool createDisc(string name, int cantEntradas, int cantBloques)
 {
     string nombreDisco = name + ".dat";
 	if(existFile(nombreDisco.c_str()))
 	{
-		return;
+		return false;
 	}
 	int bmSize = cantBloques / 8;
-	int tamanoBloque = 1024;
-	ofstream out(nombreDisco.c_str(),ios::out | ios::in);
+	ofstream out(nombreDisco.c_str(),ios::in | ios::out | ios::binary);
+	out.open(nombreDisco.c_str());
 	//metaData
-	out.write((char*)&bmSize,4);
-	out.write((char*)&cantEntradas,4);
-	out.write((char*)&tamanoBloque,4);
-	out.write((char*)&cantBloques,4);
+	METADATA meta;
+	meta.bm_size = bmSize;
+	meta.entry_amount = cantEntradas;
+	meta.block_size = 1024;
+	meta.block_amount = cantBloques;
+	out.write(reinterpret_cast<char *> (&meta),sizeof(meta));
 	//Bitmap
-	out.write((char*)&cantBloques,4);
-	int bytesBitMap = bmSize /8;
-	char* bitmap = new char[bytesBitMap];
-	for(int i = 0; i < bytesBitMap; i++)
+	char* bitmap = new char[bmSize];
+	for(int i = 0; i < bmSize; i++)
 	{
 		bitmap[i] = 0;
 	}
-	out.write(bitmap,bytesBitMap);
-	//escribir informacion vacia de files entries
+	out.write(bitmap,bmSize);
 	for(int i = 0; i < cantEntradas; i++)
 	{
-		char* datosVacios = new char[51];
-		out.write(datosVacios,51);
-		bool ocupado = false;
-		out.write((char*)&ocupado,4);
+		file_entry fat;
+		for(int m = 0; m < 30; m++)
+		{
+			fat.nombre[m] = '-';
+		}
+		fat.tamano = 0;
+		fat.tipo[0] = 'O';
+		fat.padre = -1;
+		fat.primer_hijo = -1;
+		fat.hermano_derecho = -1;
+		fat.primer_bloque_data = -1;
+		fat.libre = true;
+		out.write(reinterpret_cast<const char*>(&fat),sizeof(fat));
 	}
 	//escribir informacion vacia de bloques de data
+	cout<<"sizeof de data block: "<<sizeof(data_block)<<endl;
 	for(int i = 0; i < cantBloques; i++)
 	{
-		char* vacio = new char[1020];
-		int sig = -1;
-		out.write(vacio,1020);
-		out.write((char*)&sig,4);
+		data_block bloque;
+		bloque.siguiente = -1;
+		out.write(reinterpret_cast<char *>(&bloque),sizeof(bloque));
 	}
-	out.close();
+	return true;
+}
+
+void importar_archivo(string nombre_archivo)
+{
+	ifstream in(nombre_archivo.c_str(),ios::in | ios::binary);
+	int i = 0;
+	while(!in.eof())
+	{
+		char nombre[1];
+		in.read(nombre,1);
+		i+=1;
+	}
+	cout<<"tamano: "<<i<<endl;
+	char block[1020];
+	
 }
 

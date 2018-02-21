@@ -1,4 +1,4 @@
-#include <iostream>
+#include "functions.h"
 
  
 using namespace std;
@@ -75,12 +75,24 @@ int menuPrincipal(){
 }
 int main()
 {
-    int i;
-    do
-    {
-        i = menuPrincipal();
+    // int i;
+    // do
+    // {
+    //     i = menuPrincipal();
 
-    } while(i!=3);
+    // } while(i!=3);s
+    //createDisc("part1",100,200);
+    //importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
+    string dir = "part1.dat";
+    data_file f;
+    char* dire = new char[sizeof(dir)];
+    strcpy(dire,dir.c_str());
+    f.abrir(dire);
+    
+    //f.leer(0,4);
+    //cout<<size<<endl;
+    
+    
 
             
     return 0;
