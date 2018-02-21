@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string.h>
 #include <cstring>
+#include <bitset>
 #include "disc_structs.h"
 #include "registro.h"
  
@@ -24,7 +25,7 @@ int turnBitOff(unsigned char byte,int position)
 }
 int turnBitOn(unsigned char byte, int position)
 {
-	return (byte |= (1 << position));	
+	return byte |= (1u << position);	
 }
 
 bool createDisc(string name, int cantEntradas, int cantBloques)

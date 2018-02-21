@@ -83,6 +83,8 @@ int main()
     // } while(i!=3);s
     //createDisc("part1",100,200);
     importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
+    
+    
 
             
     return 0;

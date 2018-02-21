@@ -26,6 +26,9 @@ public:
     void abrir_archivo();
     void importar_archivo(char* nombre_archivo);
     void exportar_archivo(char* nombre_archivo);
+    int getBit(unsigned char byte,int position);
+    int turnBitOff(unsigned char byte,int position);
+    int turnBitOn(unsigned char byte,int position);
 
 private:
     data_file archivo;
