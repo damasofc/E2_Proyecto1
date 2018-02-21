@@ -3,6 +3,7 @@
 #include <string.h>
 #include <cstring>
 #include "disc_structs.h"
+#include "registro.h"
  
 using namespace std;
 
@@ -75,5 +76,20 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 		out.write(reinterpret_cast<char *>(&bloque),sizeof(bloque));
 	}
 	return true;
+}
+
+void importar_archivo(string nombre_archivo)
+{
+	ifstream in(nombre_archivo.c_str(),ios::in | ios::binary);
+	int i = 0;
+	while(!in.eof())
+	{
+		char nombre[1];
+		in.read(nombre,1);
+		i+=1;
+	}
+	cout<<"tamano: "<<i<<endl;
+	char block[1020];
+	
 }
 
