@@ -1,8 +1,13 @@
 #include "data_file.h"
 
-void data_file::abrir(char *direccion)
+data_file::data_file(char* direccion)
 {
-    this->archivo->open(direccion, ios::binary | ios::in | ios::out | ios::app);
+    strcpy(this->direccion, direccion);
+}
+
+void data_file::abrir()
+{
+    this->archivo->open(this->direccion, ios::binary | ios::in | ios::out | ios::app);
 }
 
 void data_file::cerrar()

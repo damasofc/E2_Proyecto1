@@ -65,18 +65,48 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 	return true;
 }
 
-void importar_archivo(string nombre_archivo)
+void importar_archivo(string nombre_archivo,registro regis)
 {
 	ifstream in(nombre_archivo.c_str(),ios::in | ios::binary);
-	int i = 0;
-	while(!in.eof())
-	{
-		char nombre[1];
-		in.read(nombre,1);
-		i+=1;
+	int punteroPos = 0;
+	in.seekg(0,ios::end);
+	int tamanoArch = in.tellg();
+	in.seekg(0,ios::beg);
+	int dataBlocksOcupar = tamanoArch/1020;
+	int tamanoUltimoDataBlock = tamanoArch%1020;
+	//INICIO: crear el fileEntry para el archivo
+	
+
+
+	//FIN: crear el fileEntry para el archivo
+	for(int m = 0; m < dataBlocksOcupar; m++)
+	{	
+		char* block = new char[1020];
+		if(m == 0)
+		{
+			in.read(block,1020);
+			regis.from_char_block(block);
+			regis.guardar_block(regis.getFirstBlockEmpty());	
+		}
+		else
+		{
+			in.read(block,1020);
+			//INICIO: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
+			regis.setNextBlockItm(regis.getFirstBlockEmpty());
+			regis.guardar_block(regis.getPosBlockActual());
+			//FIN: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
+			regis.from_char_block(block);
+			//en esta funcion de guardar block debe actualizarse la posicion actual del block
+			regis.guardar_block(regis.getFirstBlockEmpty());	
+		}
+		
 	}
-	cout<<"tamano: "<<i<<endl;
-	char block[1020];
+	char* block = new char[tamanoUltimoDataBlock];
+	in.read(block,tamanoUltimoDataBlock);
+	regis.setNextBlockItm(regis.getFirstBlockEmpty());
+	regis.guardar_block(regis.getPosBlockActual());
+	regis.from_char_block(block);
+	regis.guardar_block(regis.getFirstBlockEmpty());
 	
 }
 

@@ -82,15 +82,21 @@ int main()
 
     // } while(i!=3);s
     //createDisc("part1",100,200);
-    //importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
-    string dir = "part1.dat";
-    data_file f;
-    char* dire = new char[sizeof(dir)];
-    strcpy(dire,dir.c_str());
-    f.abrir(dire);
-    
-    //f.leer(0,4);
-    //cout<<size<<endl;
+    importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
+
+    // ofstream out("file.dat",ios::in | ios::out | ios::binary);
+    // out.open("file.dat");
+    // string name = "damaso|fernandez";
+    // out.write(name.c_str(),sizeof(name));
+    // ifstream in("file.dat");
+    // char info[32];
+    // in.read(reinterpret_cast<char*> (info),32);
+    // //info = turnBitOn(info,0);
+    // bitset<8> bts(*info);
+    // for(int i = 0; i < 8; i++)
+    // {
+    //     cout<<getBit(*info,i);
+    // }
     
     
 
