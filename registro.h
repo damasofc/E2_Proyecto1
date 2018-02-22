@@ -34,6 +34,8 @@ public:
     int turnBitOn(unsigned char byte,int position);
     //debe obtener el primer bloque de data vacio
     int getFirstBlockEmpty();
+    //debe obtener el primer File Entry vacio
+    int getFirstFileEntryEmpty();
     char* getBitMap();
     //esta funcion debe colocarle al block_item la posicion del siguiente bloque de data
     void setNextBlockItm(int posNext);
