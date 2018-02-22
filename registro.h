@@ -44,6 +44,8 @@ public:
     void setPrimerBlock();
     int getFirstEntryEmpty();
     void setMetaData(METADATA meta);
+    //esta funcion debe agregar la posicion del nuevo archivo creado, al directorio en el que se encuentra actualmente
+    void addNewArchivoToDir(int pos);
 
 private:
     data_file *archivo;
