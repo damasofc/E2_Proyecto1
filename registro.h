@@ -3,23 +3,28 @@
 
 #include "disc_structs.h"
 #include "data_file.h"
+#include <iostream>
+#include <cstdlib>
 
 #define FILE_ENTRY_SIZE 52
 #define DATA_BLOCK_SIZE 1020
 #define METADATA_SIZE 16
 
+using namespace std;
+
 class registro
 {
 public:
-    registro();
+    registro(char* nombre);
     void guardar_entry();
     void guardar_block(int pos);
-    void mostrar_entry();
-    void mostrar_block();
+    void mostrar_archivo();
+    void mostrar_directorio();
     char* to_char_block();
-    char* to_char_entry();
+    char* to_char_directorio();
     void from_char_block(char* input);
-    void from_char_entry(char* input);
+    void from_char_directorio(char* input);
+    void from_char_archivo(char* input);
     void leer_file_entry(int pos);
     void leer_data_block(int pos);
     void cerrar_archivo();
@@ -34,14 +39,20 @@ public:
     void setNextBlockItm(int posNext);
     //solo retorna el valor de posBlockActual
     int getPosBlockActual();
+    void setPrimerBlock();
+    int getFirstEntryEmpty();
+    void setMetaData(METADATA meta);
 
 private:
-    data_file archivo;
+    data_file *archivo;
     //este Int debe tener la posicion del bloque de data actual;
     int posBlockActual;
-    data_block block_item;
-    file_entry directorio_item;
-    file_entry archivo_item;
+    int posPrimerBlock;
+    int posPrimerEntry;
+    METADATA meta;
+    data_block *block_item;
+    file_entry *directorio_item;
+    file_entry *archivo_item;
 };
 
 
