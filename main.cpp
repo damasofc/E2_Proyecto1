@@ -82,7 +82,7 @@ int main()
 
     // } while(i!=3);s
     //createDisc("part1",100,200);
-    importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
+    //importar_archivo("/home/damasofc/Imágenes/contextMenu.png");
 
     // ofstream out("file.dat",ios::in | ios::out | ios::binary);
     // out.open("file.dat");

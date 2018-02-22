@@ -27,3 +27,15 @@ char* data_file::leer(int posicion, int bytes)
     this->archivo->read(retorno, bytes);
     return retorno;
 }
+
+char* data_file::leer(int bytes)
+{
+    char* retorno = new char[bytes];
+    this->archivo->read(retorno, bytes);
+    return retorno;
+}
+
+void data_file::set_pos(int pos)
+{
+    this->archivo->seekg(pos);
+}

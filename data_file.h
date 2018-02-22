@@ -15,6 +15,8 @@ public:
     void cerrar();
     void escribir(char* input, int bytes);
     char* leer(int posicion, int bytes);
+    char* leer(int bytes);
+    void set_pos(int pos);
 
 private:
     char* direccion;
