@@ -3,13 +3,15 @@
 
 #include <fstream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
 class data_file
 {
 public:
-    void abrir(char* direccion);
+    data_file(char* direccion);
+    void abrir();
     void cerrar();
     void escribir(char* input, int bytes);
     char* leer(int posicion, int bytes);

@@ -13,7 +13,7 @@ class registro
 public:
     registro();
     void guardar_entry();
-    void guardar_block();
+    void guardar_block(int pos);
     void mostrar_entry();
     void mostrar_block();
     char* to_char_block();
@@ -24,16 +24,21 @@ public:
     void leer_data_block(int pos);
     void cerrar_archivo();
     void abrir_archivo();
-    void importar_archivo(char* nombre_archivo);
-    void exportar_archivo(char* nombre_archivo);
     int getBit(unsigned char byte,int position);
     int turnBitOff(unsigned char byte,int position);
     int turnBitOn(unsigned char byte,int position);
+    //debe obtener el primer bloque de data vacio
     int getFirstBlockEmpty();
     char* getBitMap();
+    //esta funcion debe colocarle al block_item la posicion del siguiente bloque de data
+    void setNextBlockItm(int posNext);
+    //solo retorna el valor de posBlockActual
+    int getPosBlockActual();
 
 private:
     data_file archivo;
+    //este Int debe tener la posicion del bloque de data actual;
+    int posBlockActual;
     data_block block_item;
     file_entry directorio_item;
     file_entry archivo_item;
