@@ -1,3 +1,4 @@
+#include <atomic>
 #include "registro.h"
 
 registro::registro(char *nombre)
@@ -121,8 +122,29 @@ char* registro::to_char_block()
 char* registro::to_char_directorio()
 {
     char* retorno = new char[FILE_ENTRY_SIZE];
-    strcpy(retorno, directorio_item->nombre);
-    //strcpy(retorno, itoa())
+    strcat(retorno, archivo_item->nombre);
+    strcat(retorno, to_string(archivo_item->tamano).c_str());
+    strcat(retorno, archivo_item->tipo);
+    strcat(retorno, to_string(archivo_item->padre).c_str());
+    strcat(retorno, to_string(archivo_item->primer_hijo).c_str());
+    strcat(retorno, to_string(archivo_item->hermano_derecho).c_str());
+    strcat(retorno, to_string(archivo_item->primer_bloque_data).c_str());
+    strcat(retorno, to_string(archivo_item->libre).c_str());
+    return retorno;
+}
+
+char* registro::to_char_archivo()
+{
+    char* retorno = new char[FILE_ENTRY_SIZE];
+    strcat(retorno, directorio_item->nombre);
+    strcat(retorno, to_string(directorio_item->tamano));
+    strcat(retorno, directorio_item->tipo);
+    strcat(retorno, to_string(directorio_item->padre));
+    strcat(retorno, to_string(directorio_item->primer_hijo));
+    strcat(retorno, to_string(directorio_item->hermano_derecho));
+    strcat(retorno, to_string(directorio_item->primer_bloque_data));
+    strcat(retorno, to_string(directorio_item->libre));
+    return retorno;
 }
 
 void registro::from_char_block(char *input)
@@ -130,3 +152,55 @@ void registro::from_char_block(char *input)
     strcpy(block_item->data, input);
 }
 
+void registro::from_char_directorio(char *input)
+{
+    string extract(input);
+    strcpy(directorio_item->nombre, extract.substr(0, 30).c_str());
+    directorio_item->tamano = atoi(extract.substr(30, 4).c_str());
+    strcpy(directorio_item->tipo, extract.substr(34, 1).c_str());
+    directorio_item->padre = atoi(extract.substr(35,4).c_str());
+    directorio_item->primer_hijo = atoi(extract.substr(39,4).c_str());
+    directorio_item->hermano_derecho = atoi(extract.substr(43,4).c_str());
+    directorio_item->primer_bloque_data = atoi(extract.substr(47,4).c_str());
+    directorio_item->libre = extract.substr(41, 1).c_str() != "0";
+}
+
+void registro::from_char_archivo(char *input)
+{
+    string extract(input);
+    strcpy(archivo_item->nombre, extract.substr(0, 30).c_str());
+    archivo_item->tamano = atoi(extract.substr(30, 4).c_str());
+    strcpy(archivo_item->tipo, extract.substr(34, 1).c_str());
+    archivo_item->padre = atoi(extract.substr(35,4).c_str());
+    archivo_item->primer_hijo = atoi(extract.substr(39,4).c_str());
+    archivo_item->hermano_derecho = atoi(extract.substr(43,4).c_str());
+    archivo_item->primer_bloque_data = atoi(extract.substr(47,4).c_str());
+    archivo_item->libre = extract.substr(41, 1).c_str() != "0";
+}
+
+void registro::leer_data_block(int pos)
+{
+    int offset = 1024*pos;
+    archivo->set_pos(offset+posPrimerBlock);
+    char* retorno = new char[DATA_BLOCK_SIZE];
+    strcpy(retorno, archivo->leer(DATA_BLOCK_SIZE));
+    from_char_block(retorno);
+}
+
+void registro::leer_directorio(int pos)
+{
+    int offset = FILE_ENTRY_SIZE*pos;
+    archivo->set_pos(offset+posPrimerEntry);
+    char* retorno = new char[FILE_ENTRY_SIZE];
+    strcpy(retorno, archivo->leer(FILE_ENTRY_SIZE));
+    from_char_directorio(retorno);
+}
+
+void registro::leer_archivo(int pos)
+{
+    int offset = FILE_ENTRY_SIZE*pos;
+    archivo->set_pos(offset+posPrimerEntry);
+    char* retorno = new char[FILE_ENTRY_SIZE];
+    strcpy(retorno, archivo->leer(FILE_ENTRY_SIZE));
+    from_char_archivo(retorno);
+}
