@@ -36,6 +36,8 @@ public:
     int turnBitOn(unsigned char byte,int position);
     //debe obtener el primer bloque de data vacio
     int getFirstBlockEmpty();
+    //debe obtener el primer File Entry vacio
+    int getFirstFileEntryEmpty();
     char* getBitMap();
     //esta funcion debe colocarle al block_item la posicion del siguiente bloque de data
     void setNextBlockItm(int posNext);
@@ -44,6 +46,8 @@ public:
     void setPrimerBlock();
     int getFirstEntryEmpty();
     void setMetaData(METADATA meta);
+    //esta funcion debe agregar la posicion del nuevo archivo creado, al directorio en el que se encuentra actualmente
+    void addNewArchivoToDir(int pos);
 
 private:
     data_file *archivo;
