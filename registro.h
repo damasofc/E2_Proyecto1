@@ -28,6 +28,8 @@ public:
     void from_char_archivo(char* input);
     void leer_directorio(int pos);
     void leer_archivo(int pos);
+    //La funcion leer archivo igual, pero buscando por nombre
+    void leer_archivo(string name);
     void leer_data_block(int pos);
     void cerrar_archivo();
     void abrir_archivo();
@@ -49,6 +51,10 @@ public:
     //esta funcion debe agregar la posicion del nuevo archivo creado, al directorio en el que se encuentra actualmente
     void addNewArchivoToDir(int pos);
     int getPosDirectorioActual();
+    //esta funcion debe obtener el primer bloque de data del archivo
+    //y colocarlo en la variable  block_item
+    void leerFirstBlockDataArchivo();
+    int charToInt(char* x);
 
 private:
     data_file *archivo;

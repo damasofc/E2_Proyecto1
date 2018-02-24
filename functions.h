@@ -122,8 +122,33 @@ void importar_archivo(string nombre_archivo,registro regis)
 	
 }
 
-void exportarArchivo(registro regis,string archivoExport,string dirDestino)
+void exportarArchivo(registro regis,string archivoExport,string dirDestino,string nombreNuevo)
 {
-	
+	ofstream out(nombreNuevo.c_str(),ios::binary | ios::app);
+	out.open(nombreNuevo.c_str(),ios::binary | ios::app);
+	regis.leer_archivo(archivoExport);
+	regis.leerFirstBlockDataArchivo();
+	char* primer = new  char[sizeof(regis.to_char_block())];
+	strcpy(primer,regis.to_char_block());
+	out.write(primer,1020);
+	char* val = new char[4];
+	val[0] = primer[1021];
+	val[1] = primer[1022];
+	val[2] = primer[1023];
+	val[3] = primer[1024];
+	int sigPos = regis.charToInt(val);
+	while(sigPos != -1)
+	{
+		regis.leer_data_block(sigPos);
+		char* primer = new  char[sizeof(regis.to_char_block())];
+		strcpy(primer,regis.to_char_block());
+		out.write(primer,1020);
+		char* val = new char[4];
+		val[0] = primer[1021];
+		val[1] = primer[1022];
+		val[2] = primer[1023];
+		val[3] = primer[1024];
+		int sigPos = regis.charToInt(val);
+	}
 }
 
