@@ -7,7 +7,7 @@
 #include <cstdlib>
 
 #define FILE_ENTRY_SIZE 52
-#define DATA_BLOCK_SIZE 1020
+#define DATA_BLOCK_SIZE 1024
 #define METADATA_SIZE 16
 
 using namespace std;
@@ -22,10 +22,12 @@ public:
     void mostrar_directorio();
     char* to_char_block();
     char* to_char_directorio();
+    char* to_char_archivo();
     void from_char_block(char* input);
     void from_char_directorio(char* input);
     void from_char_archivo(char* input);
-    void leer_file_entry(int pos);
+    void leer_directorio(int pos);
+    void leer_archivo(int pos);
     void leer_data_block(int pos);
     void cerrar_archivo();
     void abrir_archivo();
@@ -52,6 +54,7 @@ private:
     data_file *archivo;
     //este Int debe tener la posicion del bloque de data actual;
     int posBlockActual;
+    int posEntryActual;
     int posPrimerBlock;
     int posPrimerEntry;
     METADATA meta;
