@@ -75,7 +75,19 @@ void importar_archivo(string nombre_archivo,registro regis)
 	int dataBlocksOcupar = tamanoArch/1020;
 	int tamanoUltimoDataBlock = tamanoArch%1020;
 	//INICIO: crear el fileEntry para el archivo
-	
+	file_entry file;
+	strcpy(file.nombre,nombre_archivo.c_str());
+	file.tamano = tamanoArch;
+	file.tipo[0] = 'A';
+	file.padre = regis.getPosDirectorioActual();
+	file.primer_hijo = -1;
+	file.hermano_derecho = -1;
+	file.libre = false;
+	file.primer_bloque_data = regis.getFirstBlockEmpty();
+	regis.from_char_archivo(reinterpret_cast<char*> (&file));
+	//aca debo de guardarlo en el disco
+	regis.addNewArchivoToDir(regis.getFirstEntryEmpty());
+	regis.guardar_entry();
 
 
 	//FIN: crear el fileEntry para el archivo
@@ -107,6 +119,11 @@ void importar_archivo(string nombre_archivo,registro regis)
 	regis.guardar_block(regis.getPosBlockActual());
 	regis.from_char_block(block);
 	regis.guardar_block(regis.getFirstBlockEmpty());
+	
+}
+
+void exportarArchivo(registro regis,string archivoExport,string dirDestino)
+{
 	
 }
 

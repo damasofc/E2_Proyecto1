@@ -46,6 +46,7 @@ public:
     void setMetaData(METADATA meta);
     //esta funcion debe agregar la posicion del nuevo archivo creado, al directorio en el que se encuentra actualmente
     void addNewArchivoToDir(int pos);
+    int getPosDirectorioActual();
 
 private:
     data_file *archivo;
@@ -55,6 +56,9 @@ private:
     int posPrimerEntry;
     METADATA meta;
     data_block *block_item;
+    // esta variable guarda la posicion dentro del disco en la que se encuentra
+    // ese directorio.
+    int posDirectorioItem;
     file_entry *directorio_item;
     file_entry *archivo_item;
 };
