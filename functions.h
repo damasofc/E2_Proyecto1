@@ -75,7 +75,19 @@ void importar_archivo(string nombre_archivo,registro regis)
 	int dataBlocksOcupar = tamanoArch/1020;
 	int tamanoUltimoDataBlock = tamanoArch%1020;
 	//INICIO: crear el fileEntry para el archivo
-	
+	file_entry file;
+	strcpy(file.nombre,nombre_archivo.c_str());
+	file.tamano = tamanoArch;
+	file.tipo[0] = 'A';
+	file.padre = regis.getPosDirectorioActual();
+	file.primer_hijo = -1;
+	file.hermano_derecho = -1;
+	file.libre = false;
+	file.primer_bloque_data = regis.getFirstBlockEmpty();
+	regis.from_char_archivo(reinterpret_cast<char*> (&file));
+	//aca debo de guardarlo en el disco
+	regis.addNewArchivoToDir(regis.getFirstEntryEmpty());
+	regis.guardar_entry();
 
 
 	//FIN: crear el fileEntry para el archivo
@@ -108,5 +120,35 @@ void importar_archivo(string nombre_archivo,registro regis)
 	regis.from_char_block(block);
 	regis.guardar_block(regis.getFirstBlockEmpty());
 	
+}
+
+void exportarArchivo(registro regis,string archivoExport,string dirDestino,string nombreNuevo)
+{
+	ofstream out(nombreNuevo.c_str(),ios::binary | ios::app);
+	out.open(nombreNuevo.c_str(),ios::binary | ios::app);
+	regis.leer_archivo(archivoExport);
+	regis.leerFirstBlockDataArchivo();
+	char* primer = new  char[sizeof(regis.to_char_block())];
+	strcpy(primer,regis.to_char_block());
+	out.write(primer,1020);
+	char* val = new char[4];
+	val[0] = primer[1021];
+	val[1] = primer[1022];
+	val[2] = primer[1023];
+	val[3] = primer[1024];
+	int sigPos = regis.charToInt(val);
+	while(sigPos != -1)
+	{
+		regis.leer_data_block(sigPos);
+		char* primer = new  char[sizeof(regis.to_char_block())];
+		strcpy(primer,regis.to_char_block());
+		out.write(primer,1020);
+		char* val = new char[4];
+		val[0] = primer[1021];
+		val[1] = primer[1022];
+		val[2] = primer[1023];
+		val[3] = primer[1024];
+		int sigPos = regis.charToInt(val);
+	}
 }
 
