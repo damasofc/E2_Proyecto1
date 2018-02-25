@@ -41,9 +41,19 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 	for(int i = 0; i < cantEntradas; i++)
 	{
 		file_entry fat;
-		for(int m = 0; m < 30; m++)
+		if(i == 0 )
 		{
-			fat.nombre[m] = '-';
+			strcpy(fat.nombre,"root");
+			fat.libre = false;
+		}
+		else
+		{
+			for(int m = 0; m < 30; m++)
+			{
+				fat.nombre[m] = '-';
+			}
+			fat.libre = true;
+
 		}
 		fat.tamano = 0;
 		fat.tipo[0] = 'O';
@@ -51,7 +61,6 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 		fat.primer_hijo = -1;
 		fat.hermano_derecho = -1;
 		fat.primer_bloque_data = -1;
-		fat.libre = true;
 		out.write(reinterpret_cast<const char*>(&fat),sizeof(fat));
 	}
 	//escribir informacion vacia de bloques de data

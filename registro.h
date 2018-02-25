@@ -5,6 +5,7 @@
 #include "data_file.h"
 #include <iostream>
 #include <cstdlib>
+#include <string.h>
 
 #define FILE_ENTRY_SIZE 52
 #define DATA_BLOCK_SIZE 1024
