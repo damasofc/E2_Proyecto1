@@ -2,6 +2,8 @@
 
 data_file::data_file(char* direccion)
 {
+    this->direccion = new  char[sizeof(direccion)];
+    this->archivo = new fstream();
     strcpy(this->direccion, direccion);
 }
 

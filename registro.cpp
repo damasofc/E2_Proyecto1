@@ -1,9 +1,21 @@
 #include <atomic>
 #include "registro.h"
 
-registro::registro(char *nombre)
+registro::registro(char* nombre)
 {
     archivo = new data_file(nombre);
+    this->directorio_item = new file_entry();
+    this->archivo_item = new file_entry();
+    this->block_item = new data_block();
+    METADATA metaDat;
+    archivo->abrir();
+    metaDat.bm_size = charToInt(archivo->leer(0,4));
+    metaDat.entry_amount = charToInt(archivo->leer(5,8));
+    metaDat.block_size = charToInt(archivo->leer(9,12));
+    metaDat.block_amount = charToInt(archivo->leer(13,16));
+    setMetaData(metaDat);
+    leer_directorio(0);
+
 }
 
 void registro::abrir_archivo()
@@ -96,7 +108,7 @@ int registro::getFirstBlockEmpty()
 int registro::getFirstEntryEmpty()
 {
     archivo->set_pos(posPrimerBlock);
-    char* test;
+    char* test = new char[FILE_ENTRY_SIZE];
     for(int i = 0; i < meta.entry_amount; i++)
     {
         strcpy(test, archivo->leer(FILE_ENTRY_SIZE));
@@ -122,28 +134,28 @@ char* registro::to_char_block()
 char* registro::to_char_directorio()
 {
     char* retorno = new char[FILE_ENTRY_SIZE];
-    strcat(retorno, archivo_item->nombre);
-    strcat(retorno, to_string(archivo_item->tamano).c_str());
+    strcpy(retorno, archivo_item->nombre);
+    strcat(retorno, (char*)&archivo_item->tamano);
     strcat(retorno, archivo_item->tipo);
-    strcat(retorno, to_string(archivo_item->padre).c_str());
-    strcat(retorno, to_string(archivo_item->primer_hijo).c_str());
-    strcat(retorno, to_string(archivo_item->hermano_derecho).c_str());
-    strcat(retorno, to_string(archivo_item->primer_bloque_data).c_str());
-    strcat(retorno, to_string(archivo_item->libre).c_str());
+    strcat(retorno, (char*)&archivo_item->padre);
+    strcat(retorno, (char*)&archivo_item->primer_hijo);
+    strcat(retorno, (char*)&archivo_item->hermano_derecho);
+    strcat(retorno, (char*)&archivo_item->primer_bloque_data);
+    strcat(retorno, (char*)&archivo_item->libre);
     return retorno;
 }
 
 char* registro::to_char_archivo()
 {
     char* retorno = new char[FILE_ENTRY_SIZE];
-    strcat(retorno, directorio_item->nombre);
-    strcat(retorno, to_string(directorio_item->tamano));
+    strcpy(retorno, directorio_item->nombre);
+    strcat(retorno, (char*)&directorio_item->tamano);
     strcat(retorno, directorio_item->tipo);
-    strcat(retorno, to_string(directorio_item->padre));
-    strcat(retorno, to_string(directorio_item->primer_hijo));
-    strcat(retorno, to_string(directorio_item->hermano_derecho));
-    strcat(retorno, to_string(directorio_item->primer_bloque_data));
-    strcat(retorno, to_string(directorio_item->libre));
+    strcat(retorno, (char*)&directorio_item->padre);
+    strcat(retorno, (char*)&directorio_item->primer_hijo);
+    strcat(retorno, (char*)&directorio_item->hermano_derecho);
+    strcat(retorno, (char*)&directorio_item->primer_bloque_data);
+    strcat(retorno, (char*)&directorio_item->libre);
     return retorno;
 }
 
@@ -190,6 +202,7 @@ void registro::leer_data_block(int pos)
 void registro::leer_directorio(int pos)
 {
     int offset = FILE_ENTRY_SIZE*pos;
+    archivo->abrir();
     archivo->set_pos(offset+posPrimerEntry);
     char* retorno = new char[FILE_ENTRY_SIZE];
     strcpy(retorno, archivo->leer(FILE_ENTRY_SIZE));
@@ -203,4 +216,46 @@ void registro::leer_archivo(int pos)
     char* retorno = new char[FILE_ENTRY_SIZE];
     strcpy(retorno, archivo->leer(FILE_ENTRY_SIZE));
     from_char_archivo(retorno);
+}
+
+void registro::leer_archivo(string name)
+{
+    int inicioBuscar = posPrimerEntry;
+    for(int i = 0; i < meta.entry_amount; i++)
+    {
+        archivo->set_pos(inicioBuscar + (i*FILE_ENTRY_SIZE));
+        char* retorno = new char[FILE_ENTRY_SIZE];
+        strcpy(retorno, archivo->leer(FILE_ENTRY_SIZE));
+        char* nomb = new char[30];
+        for(int m = 0; m < 30; m++)
+        {
+            nomb[m] = retorno[m];
+        }
+        if(name.c_str() == nomb)
+        {
+            from_char_archivo(retorno);
+            return;
+        }
+    }
+}
+
+int registro::getPosDirectorioActual()
+{
+    return posDirectorioItem;
+}
+
+void registro::addNewArchivoToDir(int pos)
+{
+
+}
+
+void registro::leerFirstBlockDataArchivo()
+{
+
+}
+
+int registro::charToInt(char* x)
+{
+    int i = (x[3] << 24) | (x[2] << 16) | (x[1] << 8) | (x[0]);
+    return i;
 }
