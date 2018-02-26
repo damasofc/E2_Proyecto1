@@ -1,9 +1,5 @@
-#include <iostream>
 #include <fstream>
-#include <string.h>
 #include <cstring>
-#include <bitset>
-#include "disc_structs.h"
 #include "registro.h"
  
 using namespace std;
@@ -22,8 +18,7 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 		return false;
 	}
 	int bmSize = cantBloques / 8;
-	ofstream out(nombreDisco.c_str(),ios::in | ios::out | ios::binary);
-	out.open(nombreDisco.c_str());
+	ofstream out(nombreDisco.c_str(),ios::binary);
 	//metaData
 	METADATA meta;
 	meta.bm_size = bmSize;
@@ -45,6 +40,8 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 		{
 			strcpy(fat.nombre,"root");
 			fat.libre = false;
+			fat.tamano = 0;
+			fat.tipo[0] = 'D';
 		}
 		else
 		{
@@ -52,19 +49,18 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 			{
 				fat.nombre[m] = '-';
 			}
+			fat.tamano = 0;
 			fat.libre = true;
+			fat.tipo[0] = 'O';
 
 		}
-		fat.tamano = 0;
-		fat.tipo[0] = 'O';
 		fat.padre = -1;
 		fat.primer_hijo = -1;
 		fat.hermano_derecho = -1;
 		fat.primer_bloque_data = -1;
-		out.write(reinterpret_cast<const char*>(&fat),sizeof(fat));
+		out.write(reinterpret_cast<char*>(&fat),sizeof(fat));
 	}
 	//escribir informacion vacia de bloques de data
-	cout<<"sizeof de data block: "<<sizeof(data_block)<<endl;
 	for(int i = 0; i < cantBloques; i++)
 	{
 		data_block bloque;
@@ -74,7 +70,7 @@ bool createDisc(string name, int cantEntradas, int cantBloques)
 	return true;
 }
 
-void importar_archivo(string nombre_archivo,registro regis)
+void importar_archivo(string nombre_archivo,registro* regis)
 {
 	ifstream in(nombre_archivo.c_str(),ios::in | ios::binary);
 	int punteroPos = 0;
@@ -84,80 +80,98 @@ void importar_archivo(string nombre_archivo,registro regis)
 	int dataBlocksOcupar = tamanoArch/1020;
 	int tamanoUltimoDataBlock = tamanoArch%1020;
 	//INICIO: crear el fileEntry para el archivo
-	file_entry file;
-	strcpy(file.nombre,nombre_archivo.c_str());
-	file.tamano = tamanoArch;
-	file.tipo[0] = 'A';
-	file.padre = regis.getPosDirectorioActual();
-	file.primer_hijo = -1;
-	file.hermano_derecho = -1;
-	file.libre = false;
-	file.primer_bloque_data = regis.getFirstBlockEmpty();
-	regis.from_char_archivo(reinterpret_cast<char*> (&file));
+	file_entry* file = new file_entry;
+	strcpy(file->nombre,nombre_archivo.c_str());
+	file->tamano = tamanoArch;
+	file->tipo[0] = 'A';
+	file->padre = regis->getPosDirectorioActual();
+	file->primer_hijo = -1;
+	file->hermano_derecho = -1;
+	file->libre = false;
+	file->primer_bloque_data = regis->getFirstBlockEmpty();
+	//cout<<"tamano archivo "<< file->tamano<<endl;
+	//return;
+	//regis->from_char_archivo(reinterpret_cast<char*> (file));
 	//aca debo de guardarlo en el disco
-	regis.addNewArchivoToDir(regis.getFirstEntryEmpty());
-	regis.guardar_entry();
-
+	regis->addNewArchivoToDir(regis->getFirstEntryEmpty());
+	regis->guardar_file_Entry(*file,regis->getFirstEntryEmpty());
+	//regis->guardar_archivo();
 
 	//FIN: crear el fileEntry para el archivo
-	for(int m = 0; m < dataBlocksOcupar; m++)
+	data_block block;
+	int tempPos = -1;
+	int conte = 0;
+	while(conte < dataBlocksOcupar)
 	{	
-		char* block = new char[1020];
-		if(m == 0)
+		char read[1020];
+		if(conte == 0)
 		{
-			in.read(block,1020);
-			regis.from_char_block(block);
-			regis.guardar_block(regis.getFirstBlockEmpty());	
+			in.read(read,1020);
+			memcpy(block.data,read,1020);
+			block.siguiente = -1;
+			//INICIO: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
+			tempPos = regis->getFirstBlockEmpty();
+			regis->guardar_block_data(block,regis->getFirstBlockEmpty());
 		}
 		else
 		{
-			in.read(block,1020);
+			block.siguiente = regis->getFirstBlockEmpty();
+			regis->actualizar_block_data(block,tempPos);
+			//regis->guardar_block_data(block,tempPos);
+			in.read(read,1020);
+			memcpy(block.data,read,1020);
+			block.siguiente = -1;
 			//INICIO: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
-			regis.setNextBlockItm(regis.getFirstBlockEmpty());
-			regis.guardar_block(regis.getPosBlockActual());
-			//FIN: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
-			regis.from_char_block(block);
-			//en esta funcion de guardar block debe actualizarse la posicion actual del block
-			regis.guardar_block(regis.getFirstBlockEmpty());	
+			tempPos = regis->getFirstBlockEmpty();
+			//cout<<"antes-- "<<regis->getFirstBlockEmpty()<<endl;
+			regis->guardar_block_data(block,regis->getFirstBlockEmpty());
+			//cout<<"despues-- "<<regis->getFirstBlockEmpty()<<endl;
 		}
-		
+		conte++;
 	}
-	char* block = new char[tamanoUltimoDataBlock];
-	in.read(block,tamanoUltimoDataBlock);
-	regis.setNextBlockItm(regis.getFirstBlockEmpty());
-	regis.guardar_block(regis.getPosBlockActual());
-	regis.from_char_block(block);
-	regis.guardar_block(regis.getFirstBlockEmpty());
+	cout<<"antes de ir al ultimo-- "<<regis->getFirstBlockEmpty()<<endl;
+	block.siguiente = regis->getFirstBlockEmpty();
+	regis->actualizar_block_data(block,tempPos);
+	//regis->guardar_block_data(block,tempPos);
+	data_block blockFinal;
+	in.read(blockFinal.data,tamanoUltimoDataBlock);
+	regis->guardar_block_data(blockFinal,regis->getFirstBlockEmpty());
 	
 }
 
 void exportarArchivo(registro regis,string archivoExport,string dirDestino,string nombreNuevo)
 {
-	ofstream out(nombreNuevo.c_str(),ios::binary | ios::app);
-	out.open(nombreNuevo.c_str(),ios::binary | ios::app);
-	regis.leer_archivo(archivoExport);
-	regis.leerFirstBlockDataArchivo();
-	char* primer = new  char[sizeof(regis.to_char_block())];
-	strcpy(primer,regis.to_char_block());
-	out.write(primer,1020);
-	char* val = new char[4];
-	val[0] = primer[1021];
-	val[1] = primer[1022];
-	val[2] = primer[1023];
-	val[3] = primer[1024];
-	int sigPos = regis.charToInt(val);
-	while(sigPos != -1)
+	ofstream out(nombreNuevo.c_str(),ios::out | ios::binary);
+	//out.open(nombreNuevo.c_str(),ios::binary | ios::app);
+	file_entry f = regis.getEntry(archivoExport);
+	data_block b = regis.getDataBlock(f.primer_bloque_data);
+	out.write(b.data,1020);
+	int dataBlocksLeer = f.tamano/1020;
+	int lastBlockSize = f.tamano%1020;
+	b = regis.getDataBlock(b.siguiente);
+	bool continua = true;
+	int dataBlocksLeidos = 1;
+	while(continua)
 	{
-		regis.leer_data_block(sigPos);
-		char* primer = new  char[sizeof(regis.to_char_block())];
-		strcpy(primer,regis.to_char_block());
-		out.write(primer,1020);
-		char* val = new char[4];
-		val[0] = primer[1021];
-		val[1] = primer[1022];
-		val[2] = primer[1023];
-		val[3] = primer[1024];
-		int sigPos = regis.charToInt(val);
+		dataBlocksLeidos++;
+		//strcat(escritura,b.data);
+		if(dataBlocksLeidos == (dataBlocksLeer+1))
+		{
+			out.write(b.data,lastBlockSize);
+			continua = false;
+			break;
+		}
+		out.write(b.data,1020);
+		if(b.siguiente == -1)
+		{
+			continua = false;
+		}
+		else
+		{
+			b = regis.getDataBlock(b.siguiente);
+		}
 	}
+	cout<<"datas leidos: "<<dataBlocksLeidos<<endl;
+	//out.write(escritura,strlen(escritura));
 }
 

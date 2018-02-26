@@ -2,8 +2,10 @@
 #define E2_PROYECTO1_DATA_FILE_H
 
 #include <fstream>
-#include <string>
 #include <cstring>
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -13,12 +15,11 @@ public:
     data_file(char* direccion);
     void abrir();
     void cerrar();
-    void escribir(char* input, int bytes);
+    void escribir(char* input,int pos,int bytes);
     char* leer(int posicion, int bytes);
     char* leer(int bytes);
     void set_pos(int pos);
 
-private:
     char* direccion;
     fstream* archivo;
 };

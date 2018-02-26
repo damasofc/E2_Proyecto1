@@ -9,7 +9,7 @@ data_file::data_file(char* direccion)
 
 void data_file::abrir()
 {
-    this->archivo->open(this->direccion, ios::binary | ios::in | ios::out | ios::app);
+    this->archivo->open(this->direccion,ios::out | fstream::app);
 }
 
 void data_file::cerrar()
@@ -17,23 +17,27 @@ void data_file::cerrar()
     this->archivo->close();
 }
 
-void data_file::escribir(char *input, int bytes)
+void data_file::escribir(char *input,int pos,int bytes)
 {
-    this->archivo->write(input, bytes);
+    ofstream out(this->direccion,ios::out | ios::in | ios::binary);
+    out.seekp(pos);
+    out.write(input,bytes);
 }
 
 char* data_file::leer(int posicion, int bytes)
 {
     char* retorno = new char[bytes];
-    this->archivo->seekg(posicion);
-    this->archivo->read(retorno, bytes);
+    ifstream in(this->direccion,ios::in | ios::binary);
+    in.seekg(posicion);
+    in.read(retorno,bytes);
     return retorno;
 }
 
 char* data_file::leer(int bytes)
 {
     char* retorno = new char[bytes];
-    this->archivo->read(retorno, bytes);
+    ifstream in(this->direccion);
+    in.read(retorno,bytes);
     return retorno;
 }
 
