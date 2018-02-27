@@ -106,8 +106,8 @@ void importar_archivo(string nombre_archivo,registro* regis)
 		char read[1020];
 		if(conte == 0)
 		{
-			in.read(read,1020);
-			memcpy(block.data,read,1020);
+			in.read(block.data,1020);
+			//memcpy(block.data,read,1020);
 			block.siguiente = -1;
 			//INICIO: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
 			tempPos = regis->getFirstBlockEmpty();
@@ -118,8 +118,8 @@ void importar_archivo(string nombre_archivo,registro* regis)
 			block.siguiente = regis->getFirstBlockEmpty();
 			regis->actualizar_block_data(block,tempPos);
 			//regis->guardar_block_data(block,tempPos);
-			in.read(read,1020);
-			memcpy(block.data,read,1020);
+			in.read(block.data,1020);
+			//memcpy(block.data,read,1020);
 			block.siguiente = -1;
 			//INICIO: le digo cual es el siguiente bloque al que esta actualmente y de ultimo lo guardo nuevamente
 			tempPos = regis->getFirstBlockEmpty();
@@ -129,7 +129,6 @@ void importar_archivo(string nombre_archivo,registro* regis)
 		}
 		conte++;
 	}
-	cout<<"antes de ir al ultimo-- "<<regis->getFirstBlockEmpty()<<endl;
 	block.siguiente = regis->getFirstBlockEmpty();
 	regis->actualizar_block_data(block,tempPos);
 	//regis->guardar_block_data(block,tempPos);
@@ -171,6 +170,7 @@ void exportarArchivo(registro regis,string archivoExport,string dirDestino,strin
 			b = regis.getDataBlock(b.siguiente);
 		}
 	}
+	out.close();
 	cout<<"datas leidos: "<<dataBlocksLeidos<<endl;
 	//out.write(escritura,strlen(escritura));
 }

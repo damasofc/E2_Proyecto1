@@ -71,6 +71,7 @@ public:
     char* readChar(int desde, int cantLeer, char* read);
     void crearDir(string name);
     void mostrarEntry(file_entry fil);
+    void cambiarDirectorio(string nameDir);
 
     data_file *archivo;
     //este Int debe tener la posicion del bloque de data actual;
@@ -85,6 +86,7 @@ public:
     int posDirectorioItem;
     file_entry *directorio_item;
     file_entry *archivo_item;
+    string dirPath;
 };
 
 

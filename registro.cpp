@@ -16,8 +16,11 @@ registro::registro(char* nombre)
     metaDat.block_amount = charToInt(archivo->leer(12,4));
     setMetaData(metaDat);
     this->posPrimerEntry = 16 + metaDat.bm_size;
+    cout<<directorio_item->primer_hijo<<endl;
     leer_directorio(0);
+    cout<<directorio_item->primer_hijo<<endl;
     this->posDirectorioItem = 0;
+    dirPath = "root";
     this->posPrimerBlock = 16 + meta.bm_size + (FILE_ENTRY_SIZE*meta.entry_amount);
 
 }
@@ -49,6 +52,7 @@ void registro::mostrar_directorio()
     cout << "Nombre: " <<directorio_item->nombre << endl;
     cout << "Size: " <<directorio_item->tamano << endl;
     cout << "Tipo: Directorio" << endl;
+    cout << "Padre: "<< directorio_item->padre << endl;
 }
 
 void registro::setMetaData(METADATA meta)
@@ -255,15 +259,14 @@ void registro::leer_directorio(int pos)
 void registro::listar_directorio()
 {
     cout<<"\t"<<this->pathDirActual(*this->directorio_item)<<endl<<endl;
-    file_entry temp = getEntry(this->directorio_item->primer_hijo);
-    // mostrarEntry(temp);
-    bool continua = true;
     cout<<"\tNombre\t\t\tTamano\t\t\tTipo"<<endl;
-    if(this->directorio_item->primer_hijo == -1)
+    if(directorio_item->primer_hijo == -1)
         return;
+    file_entry temp = getEntry(this->directorio_item->primer_hijo);
+    bool continua = true;
     while(continua)
     {
-        cout<<"\t"<<temp.nombre<<"\t\t\t"<<temp.tamano<<"\t\t\t"<<temp.tipo<<endl;
+        cout<<"\t"<<temp.nombre<<"\t\t\t"<<temp.tamano<<"\t\t\t"<<temp.tipo[0]<<endl;
         if(temp.hermano_derecho != -1)
         {
             temp = getEntry(temp.hermano_derecho);
@@ -277,18 +280,13 @@ void registro::listar_directorio()
 
 string registro::pathDirActual(file_entry fil)
 {
-    string rem = "root/";
-    if(this->directorio_item->padre == -1)
-    {
-        return rem;
-    }
-    return pathDirActual(getEntry(fil.padre))+"/"+fil.nombre;
+    return dirPath;
 }
 
 file_entry registro::getEntry(int pos)
 {
     int offset = FILE_ENTRY_SIZE*pos;
-    int posColocar = offset+this->posPrimerEntry;
+    int posColocar = offset+posPrimerEntry;
     archivo->abrir();
     char* retorno = new char[FILE_ENTRY_SIZE];
     memcpy(retorno,archivo->leer(posColocar,FILE_ENTRY_SIZE),FILE_ENTRY_SIZE);
@@ -338,6 +336,25 @@ void registro::leer_directorio(string name)
             from_char_archivo(retorno);
             return;
         }
+    }
+}
+
+void registro::cambiarDirectorio(string nameDir)
+{
+    file_entry temp = getEntry(nameDir);
+    if(temp.tipo[0] == 'D')
+    {
+        directorio_item = &temp;
+        for(int i = 0; i < meta.entry_amount; i++)
+        {
+            if(getEntry(i).nombre == nameDir)
+            {
+                posDirectorioItem = i;
+                dirPath += "/"+nameDir;
+                return;
+            }
+        }
+        
     }
 }
 
@@ -530,6 +547,7 @@ data_block registro::getDataBlock(int pos)
     archivo->abrir();
     char* retorno = new char[DATA_BLOCK_SIZE];
     data_block nuevo;
+    //strcpy(reinterpret_cast<char*> (&nuevo),archivo->leer(posColocar,1024));
     strcpy(nuevo.data,archivo->leer(posColocar,1020));
     //memcpy(retorno,archivo->leer(posColocar,DATA_BLOCK_SIZE),DATA_BLOCK_SIZE);
     //----------------
