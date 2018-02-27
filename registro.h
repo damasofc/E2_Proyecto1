@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <string.h>
 
-#define FILE_ENTRY_SIZE 52
+#define FILE_ENTRY_SIZE 60
 #define DATA_BLOCK_SIZE 1024
 #define METADATA_SIZE 16
 
@@ -18,7 +18,11 @@ class registro
 public:
     registro(char* nombre);
     void guardar_entry();
+    void guardar_archivo();
+    void guardar_file_Entry(file_entry file,int pos);
+    void guardar_directorio();
     void guardar_block(int pos);
+    void guardar_block_data(data_block block,int pos);
     void mostrar_archivo();
     void mostrar_directorio();
     char* to_char_block();
@@ -28,6 +32,12 @@ public:
     void from_char_directorio(char* input);
     void from_char_archivo(char* input);
     void leer_directorio(int pos);
+    void listar_directorio();
+    data_block getDataBlock(int pos);
+    file_entry getEntry(int pos);
+    file_entry getEntry(string name);
+    string pathDirActual(file_entry fil);
+    void leer_directorio(string name);
     void leer_archivo(int pos);
     //La funcion leer archivo igual, pero buscando por nombre
     void leer_archivo(string name);
@@ -38,6 +48,7 @@ public:
     int turnBitOff(unsigned char byte,int position);
     int turnBitOn(unsigned char byte,int position);
     //debe obtener el primer bloque de data vacio
+    int getByteBlockEmpty();
     int getFirstBlockEmpty();
     //debe obtener el primer File Entry vacio
     int getFirstFileEntryEmpty();
@@ -52,16 +63,20 @@ public:
     //esta funcion debe agregar la posicion del nuevo archivo creado, al directorio en el que se encuentra actualmente
     void addNewArchivoToDir(int pos);
     int getPosDirectorioActual();
+    void actualizar_block_data(data_block b,int pos);
     //esta funcion debe obtener el primer bloque de data del archivo
     //y colocarlo en la variable  block_item
     void leerFirstBlockDataArchivo();
     int charToInt(char* x);
+    char* readChar(int desde, int cantLeer, char* read);
+    void crearDir(string name);
+    void mostrarEntry(file_entry fil);
+    void cambiarDirectorio(string nameDir);
 
-private:
     data_file *archivo;
     //este Int debe tener la posicion del bloque de data actual;
     int posBlockActual;
-    int posEntryActual;
+    int posArchivoActual;
     int posPrimerBlock;
     int posPrimerEntry;
     METADATA meta;
@@ -71,6 +86,7 @@ private:
     int posDirectorioItem;
     file_entry *directorio_item;
     file_entry *archivo_item;
+    string dirPath;
 };
 
 

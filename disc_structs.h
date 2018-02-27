@@ -5,27 +5,27 @@
 struct data_block
 {
     char data[1020];
-    int siguiente;
+    int siguiente = -1;
 };
 
 struct file_entry
 {
     char nombre[30];
-    int tamano;
+    int tamano = 0;
     char tipo[1]; // 'D' Directorio  o  'A' Archivo
-    int padre;
-    int primer_hijo;
-    int hermano_derecho;
-    int primer_bloque_data;
-    bool libre;
+    int padre = -1;
+    int primer_hijo = -1;
+    int hermano_derecho = -1;
+    int primer_bloque_data = -1;
+    bool libre = true;
 };
 
 struct METADATA
 {
-    int bm_size; //bit map size
-    int entry_amount; //entradas(tamano)
-    int block_size; //tamano bloque
-    int block_amount; //cantidad bloques
+    int bm_size = 0; //bit map size
+    int entry_amount = 0; //entradas(tamano)
+    int block_size = 1024; //tamano bloque
+    int block_amount = 0; //cantidad bloques
 };
 
 #endif //E2_PROYECTO1_DISC_STRUCTS_H
